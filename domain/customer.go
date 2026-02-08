@@ -3,6 +3,8 @@ package domain
 import (
 	"context"
 	"database/sql"
+
+	"github.com/wynyga/gotoko/dto"
 )
 
 type Customer struct {
@@ -10,7 +12,7 @@ type Customer struct {
 	Code      string       `db:"code"`
 	Name      string       `db:"name"`
 	CreatedAt sql.NullTime `db:"created_at"`
-	UpdateAt  sql.NullTime `db:"updated_at"`
+	UpdatedAt sql.NullTime `db:"updated_at"`
 	DeletedAt sql.NullTime `db:"deleted_at"`
 }
 

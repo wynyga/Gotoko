@@ -7,7 +7,7 @@ import (
 	"github.com/joho/godotenv"
 )
 
-func get() *Config {
+func Get() *Config {
 	err := godotenv.Load()
 
 	if err != nil {
@@ -17,7 +17,7 @@ func get() *Config {
 	return &Config{
 		Server: Server{
 			Host: os.Getenv("SERVER_HOST"),
-			Port: os.Getenv("SERVER_HOST"),
+			Port: os.Getenv("SERVER_PORT"),
 		},
 		Database: Database{
 			Host: os.Getenv("DB_HOST"),
