@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"time"
 
 	"github.com/google/uuid"
@@ -44,4 +45,18 @@ func (c customerService) Create(ctx context.Context, req dto.CreateCustomerReque
 		CreatedAt: sql.NullTime{Valid: true, Time: time.Now()},
 	}
 	return c.customerRepository.Save(ctx, &customer)
+}
+
+func (c customerService) Update(ctx context.Context, req dto.UpdateCustomerRequest) error {
+	persisted, err := c.customerRepository.FindById(ctx, req.ID)
+	if err != nil {
+		return err
+	}
+	if persisted.ID == "" {
+		return errors.New("data customer tidak ditemukan")
+	}
+	persisted.Code = req.Code
+	persisted.Name = req.Name
+	persisted.UpdatedAt = sql.NullTime{Valid: true, Time: time.Now()}
+	return c.customerRepository.Update(ctx, &persisted)
 }

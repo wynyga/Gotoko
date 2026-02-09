@@ -22,6 +22,7 @@ func NewCustomer(app *fiber.App, customerService domain.CustomerService) {
 
 	app.Get("/customers", ca.Index)
 	app.Post("/customers", ca.Create)
+	app.Put("/customers/:id", ca.Update)
 }
 
 func (ca customerAPI) Index(ctx *fiber.Ctx) error {
@@ -57,4 +58,28 @@ func (ca customerAPI) Create(ctx *fiber.Ctx) error {
 	return ctx.Status(http.StatusCreated).
 		JSON(dto.CreateResponseSuccess(" "))
 
+}
+
+func (ca customerAPI) Update(ctx *fiber.Ctx) error {
+	c, cancel := context.WithTimeout(ctx.Context(), 10*time.Second)
+	defer cancel()
+
+	var req dto.UpdateCustomerRequest
+	if err := ctx.BodyParser(&req); err != nil {
+		return ctx.SendStatus(http.StatusUnprocessableEntity)
+	}
+	fails := util.Validate(req)
+	if len(fails) > 0 {
+		return ctx.Status(http.StatusBadRequest).
+			JSON(dto.CreateResponseErrorData("validation failed", fails))
+	}
+
+	req.ID = ctx.Params("id")
+	err := ca.customerService.Update(c, req)
+	if err != nil {
+		return ctx.Status(http.StatusInternalServerError).
+			JSON(dto.CreateResponseError(err.Error()))
+	}
+	return ctx.Status(http.StatusOK).
+		JSON(dto.CreateResponseSuccess("data customer berhasil diupdate"))
 }
