@@ -28,4 +28,6 @@ type CustomerService interface {
 	Index(ctx context.Context) ([]dto.CustomerData, error)
 	Create(ctx context.Context, req dto.CreateCustomerRequest) error
 	Update(ctxx context.Context, req dto.UpdateCustomerRequest) error
+	Delete(ctx context.Context, id string) error                   //Step 1 domain 2 service 3 repository 4. Api
+	Show(ctx context.Context, id string) (dto.CustomerData, error) //Jangan lupa nama methodnya harus besar agar bisa diakses oleh package lain
 }
