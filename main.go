@@ -24,9 +24,15 @@ func main() {
 
 	app := fiber.New()
 
+	//Customer
 	customerRepository := repository.NewCustomer(dbConnection)
 	customerService := service.NewCustomer(customerRepository)
 	api.NewCustomer(app, customerService)
+
+	//Auth
+	userRepository := repository.NewUser(dbConnection)
+	authService := service.NewAuth(cnf, userRepository)
+	api.NewAuth(app, authService)
 
 	fmt.Printf("4. Server akan berjalan di port: %s\n", cnf.Server.Port)
 	err := app.Listen(cnf.Server.Host + ":" + cnf.Server.Port)
