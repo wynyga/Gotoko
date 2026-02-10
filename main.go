@@ -3,8 +3,11 @@ package main
 import (
 	"fmt"
 	"log"
+	"net/http"
 
+	jwtMid "github.com/gofiber/contrib/jwt"
 	"github.com/gofiber/fiber/v2"
+	"github.com/wynyga/gotoko/dto"
 	"github.com/wynyga/gotoko/internal/api"
 	"github.com/wynyga/gotoko/internal/config"
 	"github.com/wynyga/gotoko/internal/connection"
@@ -24,15 +27,24 @@ func main() {
 
 	app := fiber.New()
 
-	//Customer
-	customerRepository := repository.NewCustomer(dbConnection)
-	customerService := service.NewCustomer(customerRepository)
-	api.NewCustomer(app, customerService)
+	//MiddleWare
+	jwtMidd := jwtMid.New(jwtMid.Config{
+		SigningKey: jwtMid.SigningKey{Key: []byte(cnf.Jwt.Key)},
+		ErrorHandler: func(ctx *fiber.Ctx, err error) error {
+			return ctx.Status(http.StatusUnauthorized).
+				JSON(dto.CreateResponseError("Endpoint perlu token"))
+		},
+	})
 
 	//Auth
 	userRepository := repository.NewUser(dbConnection)
 	authService := service.NewAuth(cnf, userRepository)
 	api.NewAuth(app, authService)
+
+	//Customer
+	customerRepository := repository.NewCustomer(dbConnection)
+	customerService := service.NewCustomer(customerRepository)
+	api.NewCustomer(app, customerService, jwtMidd)
 
 	fmt.Printf("4. Server akan berjalan di port: %s\n", cnf.Server.Port)
 	err := app.Listen(cnf.Server.Host + ":" + cnf.Server.Port)
