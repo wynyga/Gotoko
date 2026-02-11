@@ -46,6 +46,12 @@ func main() {
 	customerService := service.NewCustomer(customerRepository)
 	api.NewCustomer(app, customerService, jwtMidd)
 
+	//Book
+	bookRepository := repository.NewBook(dbConnection)
+	bookStockRepository := repository.NewBookStock(dbConnection)
+	bookService := service.NewBook(bookRepository, bookStockRepository)
+	api.NewBook(app, bookService, jwtMidd)
+
 	fmt.Printf("4. Server akan berjalan di port: %s\n", cnf.Server.Port)
 	err := app.Listen(cnf.Server.Host + ":" + cnf.Server.Port)
 	if err != nil {
